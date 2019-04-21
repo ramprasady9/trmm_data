@@ -9,15 +9,13 @@ import datetime
 def read_trmm_nc4(ifilename,ires):
     
     ds = Dataset(ifilename,'r',format='NETCDF4') 
-     # Dataset is the class behavior to open the file
-     # and create an instance of the ncCDF4 class
+    # Dataset is the class behavior to open the file
+    # and create an instance of the ncCDF4 class
 
-    print(ds.file_format)
+    # print(ds.file_format)
     # print(ds.variables)
     # print(ds.groups)
     # print(ds.dimensions)
-    #for x in ds['lon']:
-        #print(x)
     
     lon=np.array(ds.variables['lon'])
     lat=np.array(ds.variables['lat'])
@@ -85,13 +83,9 @@ def plot_row(trmm_data,i):
     pp.show()
     return 0
 
-def plot_grid_rain(rain_data,i):
-    ## i starts with 1
-    # precip1=np.reshape(trmm_data['data2d'],(1,1440*400))
-    # pp.plot(rain_data[i,:],'b',marker='o',label='precip')
-    i=0
-    ind=np.arange(rain_data[i,:].size)
-    pp.bar((ind+1),rain_data[i,:],'b',label='precip')
+def plot_grid_rain(rain_data,listdates,i):
+    # pp.plot(rain_data[i,:],'b',label='precip')
+    pp.bar(listdates,rain_data[i,:],color='skyblue',label='precip')
     # pp.grid(axis='both')
     pp.xlabel('Time in (days')
     pp.ylabel('Precipitation in (mm)')
@@ -104,7 +98,7 @@ def plot_grid_rain(rain_data,i):
 def get_trmm_dates_all():
     # today=datetime.date.today()
     startDay=datetime.date(1998,1,1)
-    endDay=datetime.date(1998,1,31)
+    endDay=datetime.date(1998,12,31)
     
     delta=endDay-startDay # +1
     # delta.days+1
@@ -130,7 +124,7 @@ def get_trmm_data_by_country(pathIn,icountry):
     print(df_grid_country.size )
     # print(len(listdates))
     
-    rain_data=np.full((df_grid_country['index'].size,len(listdates)),0.0,dtype=np.float32)
+    data=np.full((df_grid_country['index'].size,len(listdates)),0.0,dtype=np.float32)
     
     trmm_data_version=str(7)
     iday=0
@@ -138,13 +132,9 @@ def get_trmm_data_by_country(pathIn,icountry):
         nc_file=pathIn+ 'precip/' + '3B42_Daily.'+ x + '.'+trmm_data_version +'.nc4'
         print(x)
         trmm_data=read_trmm_nc4(nc_file,ires = '1d')
-        # print(df_grid_country['index'])
-        # for x in 
-        # print(df_grid_country['index'].size);
-        rain_data[:,iday]=trmm_data['data1d'][0,df_grid_country['index']];
+        data[:,iday]=trmm_data['data1d'][0,df_grid_country['index']];
         iday=iday+1
-        # break
-    return rain_data
+    return {'listdates': listdates,'index': df_grid_country['index'],'ilon': df_grid_country['ilon'],'ilat' :df_grid_country['ilat'],'lon': df_grid_country['lon'], 'lat': df_grid_country['lat'] ,'data': data}
 
 ## main function to test functions
 def main():
@@ -152,8 +142,9 @@ def main():
     # PathIn needs to be the root folder for TRMM data, data are stored in netcdf4 format
     # Precipitation data is stored inside a folder 'Precip'
     pathIn = '/run/media/ram/Work/trmm_data/'
-    rain_data=get_trmm_data_by_country(pathIn,'Sri Lanka')
-    plot_grid_rain(rain_data,0)
+    res=get_trmm_data_by_country(pathIn,'Sri Lanka')
+    listdates_int = list(map(int, res['listdates']))
+    plot_grid_rain(res['data'],listdates_int,0)
     # trmm_grid=trmm_write_grid2csv(trmm_data)
     # plot_row(trmm_data,1200)
 
