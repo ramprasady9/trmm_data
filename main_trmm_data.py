@@ -98,7 +98,7 @@ def plot_grid_rain(rain_data,listdates,i):
 def get_trmm_dates_all():
     # today=datetime.date.today()
     startDay=datetime.date(1998,1,1)
-    endDay=datetime.date(1998,12,31)
+    endDay=datetime.date(2014,12,31)
     
     delta=endDay-startDay # +1
     # delta.days+1
