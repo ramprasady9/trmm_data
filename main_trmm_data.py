@@ -110,6 +110,22 @@ def get_trmm_dates_all():
     # print(listdates)
     return listdates
 
+def get_trmm_dates_all_python():
+    # today=datetime.date.today()
+    startDay=datetime.date(1998,1,1)
+    endDay=datetime.date(2014,12,31)
+    
+    delta=endDay-startDay # +1
+    # delta.days+1
+    print(delta.days)
+
+    dd = [startDay + datetime.timedelta(days=x) for x in range((endDay-startDay).days + 1)]      
+    lmonth=[]
+    
+    for x in dd:
+        lmonth.append(x.month+x.year*100)
+    return lmonth
+
 def get_trmm_data_by_country(pathIn,icountry):
     listdates=get_trmm_dates_all()
     # TRMM data version last available as of 21st April 2019 for download
